@@ -1,0 +1,134 @@
+{% load staticfiles thumbnail %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% if config.name %} {{ config.name }} - {{ config.slogan }} {% else %} Inflr Test {% endif %}</title>
+        <link rel="stylesheet" href="{% static 'css/materialize.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <meta name="author" content="Inflr">
+        <meta name="description" content="Inflr">
+        <meta name="keywords" content="Inflr">
+        <meta name="viewport" content="initial-scale=1">
+    </head>
+    <body>
+
+        <header>
+            <nav class="indigo darken-3">
+                <div class="nav-wrapper">
+                    <div class="container">
+                        {% if config.logo %}
+                            <a href="{% url 'home' %}" class="brand-logo"><img src="{{ config.logo.url }}" alt=""></a>
+                        {% else %}
+                            <a href="{% url 'home' %}" class="brand-logo"><img src="{% static 'img/logo.png' %}" alt=""></a>
+                        {% endif %}
+                        <ul id="nav-mobile" class="right hide-on-med-and-down">
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'product_list' %}">Produtos</a></li>
+                            {% if user.is_authenticated %}
+                                <li><a href="{% url 'accounts:myproducts' %}">Meus Produtos</a></li>
+                                <li><a href="{% url 'accounts:admin' %}">Minha Conta</a></li>
+                                <li><a href="{% url 'logout' %}">Sair</a></li>
+                            {% else %}
+                                <li><a href="{% url 'accounts:register' %}">Registra-se</a></li>
+                                <li><a href="{% url 'login' %}">Entrar</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        {% block "block_content" %}
+        <div class="slider">
+            <ul class="slides">
+                {% for obj in  products %}
+                    <li>
+                        {% thumbnail obj.img "980x200" crop="top" as im %}
+                            <img src="{{ im.url }}" width="100%" />
+                        {% empty %}
+                            <img src="{{ obj.img_url }}" width="100%" />
+                        {% endthumbnail %}
+                        <div class="caption center-align">
+                            <h3>{{ obj.name }}</h3>
+                            <h5 class="light grey-text text-lighten-3">{{ obj.description }}</h5>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="container">
+            <ul class="collection with-header">
+                <li class="collection-header"><h6>Lista de Produtos</h6></li>
+            </ul>
+
+            <div class="row">
+                {% for obj in products %}
+                    <div class="col s12 m4">
+                        <div class="card">
+                            <div class="card-image">
+                                {% if obj.img %}
+                                    {% thumbnail obj.img "296x150" crop="top" as im %}
+                                        <img src="{{ im.url }}" width="100%" />
+                                    {% endthumbnail %}
+                                {% else %}
+                                    {% thumbnail obj.img_url "296x150" crop="top" as im %}
+                                        <img src="{{ im.url }}" width="100%" />
+                                    {% endthumbnail %}
+                                {% endif %}
+                            </div>
+                            <div class="card-content">
+                                <span class="card-title indigo-text text-darken-4">{{ obj.name }}</span>
+                                <p>{{ obj.description }}</p>
+                                <span class="card-title red-text text-darken-4">R$ {{ obj.price }}</span>
+                                <p class="indigo-text text-darken-3">Postado por: {% if obj.user.name %}{{ obj.user.name }}{% else %}{{ obj.user.username }}{% endif %}</p>
+                            </div>
+                            <div class="card-action">
+                                <a href="{{ obj.get_absolute_url }}" class="waves-effect waves-light btn indigo darken-3" >Visualizar</a>
+                                <a href="{% url 'purchase:purchases' obj.slug %}" class="waves-effect waves-light btn indigo darken-4"><i class="material-icons left">shopping_basket</i>Comprar</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <h6>Não existe produtos cadastrados no momento</h6>
+                {% endfor %}
+            </div>
+        </div>
+        {% endblock %}
+
+        <footer class="page-footer indigo darken-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col l6 s12">
+                        <h5 class="white-text">{% if config.name %} {{ config.name }}{% else %} Inflr Test {% endif %}</h5>
+                        <p class="grey-text text-lighten-4">{{ config.slogan }}</p>
+                    </div>
+                    <div class="col l4 offset-l2 s12">
+                        <h5 class="white-text">Redes Sociais</h5>
+                        <ul>
+                            {% for obj in config.socialnetwork_set.all %}
+                                <li><a href="" class="grey-text text-lighten-3">{{ obj.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-copyright indigo darken-3">
+                <div class="container">
+                    © {% now 'Y' %}, {% if config.name %} {{ config.name }} - {{ config.slogan }} {% else %} Inflr Test {% endif %} - Todos os Direitos Reservados
+                </div>
+            </div>
+        </footer>
+
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="{% static 'js/materialize.min.js' %}"></script>
+        <script>
+            $(document).ready(function(){
+              $('.slider').slider();
+            });
+        </script>
+    </body>
+</html>

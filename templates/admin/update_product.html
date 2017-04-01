@@ -1,0 +1,29 @@
+{% extends "admin/admin.html" %}
+{% load static widget_tweaks %}
+{% block "block_admin" %}
+    <ul class="collection with-header">
+        <li class="collection-header"><h6>Editando Produto: {{ object.name }}</h6></li>
+    </ul>
+    <div class="card-panel">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for error in form.non_field_errors %}
+                <div class="card-panel red darken-4">
+                    <span class="grey-text text-lighten-5">{{ error }}</span>
+                </div>
+            {% endfor %}
+            {% for field in form %}
+                <div class="row">
+                    <div class="input-field col s12">
+                        {% render_field field class="validate" %}
+                        <label>{{ field.label }}</label>
+                        {% for error in field.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn waves-effect waves-light indigo darken-4"><i class="material-icons right">send</i> Atualizar</button>
+        </form>
+    </div>
+{% endblock %}

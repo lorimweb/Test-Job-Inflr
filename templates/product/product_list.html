@@ -1,0 +1,41 @@
+{% extends "index.html" %}
+{% load static thumbnail %}
+{% block "block_content" %}
+    <div class="container">
+        <ul class="collection with-header">
+            <li class="collection-header"><h6>Lista de Produtos</h6></li>
+        </ul>
+
+        <div class="row">
+            {% for obj in product_list %}
+                <div class="col s12 m4">
+                    <div class="card">
+                        <div class="card-image">
+                            {% if obj.img %}
+                                {% thumbnail obj.img "296x150" crop="top" as im %}
+                                    <img src="{{ im.url }}" width="100%" />
+                                {% endthumbnail %}
+                            {% else %}
+                                {% thumbnail obj.img_url "296x150" crop="top" as im %}
+                                    <img src="{{ im.url }}" width="100%" />
+                                {% endthumbnail %}
+                            {% endif %}
+                        </div>
+                        <div class="card-content">
+                            <span class="card-title indigo-text text-darken-4">{{ obj.name }}</span>
+                            <p>{{ obj.description }}</p>
+                            <span class="card-title red-text text-darken-4">R$ {{ obj.price }}</span>
+                            <p class="indigo-text text-darken-3">Postado por: {% if obj.user.name %}{{ obj.user.name }}{% else %}{{ obj.user.username }}{% endif %}</p>
+                        </div>
+                        <div class="card-action">
+                            <a href="{{ obj.get_absolute_url }}" class="waves-effect waves-light btn indigo darken-3" >Visualizar</a>
+                            <a href="{% url 'purchase:purchases' obj.slug %}" class="waves-effect waves-light btn indigo darken-4"><i class="material-icons left">shopping_basket</i>Comprar</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <h6>Não existe produtos cadastrados no momento</h6>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
